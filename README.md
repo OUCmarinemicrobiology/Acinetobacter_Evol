@@ -117,15 +117,14 @@ raxmlHPC -f a -x 12345 -p 12345 -# 100 -m GTRGAMMAX -s clean.core.aln -n tree
 ## 11. Ancestral state reconstruction of gene number
 ### Phytools, R
 ```R
-# phylogenetic_tree.nwk and gene_count.csv can be found in `Gene_ancestral_state` dictionary,
+# phylogenetic_tree.nwk and gene_count.csv can be found in `Gene_ancestral_state` dictionary.
 setwd("path/work_dictionary")
 library(phytools)
 
 tree <- read.tree("phylogenetic_tree.nwk")
-#the phylogenetic tree built in 10 above.
 
-mge <- read.csv("gene_count.csv",row.names=1) # input MGE number of each isolates.
-mge<-as.matrix(mge)[,1] # selected replicon as example
+mge <- read.csv("gene_count.csv",row.names=1) # input gene number of each isolates.
+mge<-as.matrix(mge)[,1] # selected first column as example
 
 # estimate ancestral states and compute variances & 95% confidence intervals for each node:
 fit<-fastAnc(tree,mge,vars=TRUE,CI=TRUE)
@@ -147,8 +146,25 @@ plot(obj,legend=0.7*max(nodeHeights(tree)),
      fsize=c(0.1,0.9), lwd=1, outline = F, leg.txt="gene_count",ftype="off")
 ```
 
+## 11. Habitat switch
+### Phytools, R
+```R
+# phylogenetic_tree.nwk and genome_habitat.csv can be found in `Habitat_ancestral_state` dictionary.
+setwd("path/work_dictionary")
+library(phytools)
 
+tree <- read.tree("phylogenetic_tree.nwk")
 
-
-
+mge <- read.csv("genome_habitat.csv",row.names=1) # input gene number of each isolates.
+mge<-as.matrix(mge)[,1] # selected first column as example
+mtree<-make.simmap(tree,x,model="ER",,nsim=100)
+mtrees
+par(mfrow=c(10,10))
+null<-sapply(mtrees,plot,colors=cols,lwd=1,ftype="off")
+pd<-summary(mtrees,plot=FALSE)
+pd
+cols <- read.csv("cols.CSV",row.names =1) #set color
+cols <- as.matrix(cols)[,1]
+plot(mtrees[[1]],cols,type="fan",fsize=0.8,ftype="off")
+```
 
