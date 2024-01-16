@@ -28,6 +28,7 @@ The links below the sub-headings lead to the scripts needed for the correspondin
 - [Gubbins](https://github.com/nickjcroucher/gubbins)
 - [Phytools](https://cran.r-project.org/web/packages/phytools/index.html)
 - [Seqkit](https://bioinf.shenwei.me/seqkit/)
+- [Hyphy](https://github.com/veg/hyphy-analyses/tree/master/FitMG94)
 
 >Take the A-baumannii-104 isolate as an example.
 
@@ -146,7 +147,7 @@ plot(obj,legend=0.7*max(nodeHeights(tree)),
      fsize=c(0.1,0.9), lwd=1, outline = F, leg.txt="gene_count",ftype="off")
 ```
 
-## 11. Habitat switch
+## 11. Habitat switching
 ### Phytools, R
 ```R
 # phylogenetic_tree.nwk and genome_habitat.csv can be found in `Habitat_switching` dictionary.
@@ -167,4 +168,15 @@ cols <- read.csv("cols.csv",row.names =1) #set color
 cols <- as.matrix(cols)[,1]
 plot(mtrees[[1]],cols,type="fan",fsize=0.8,ftype="off")
 ```
+
+## 11. Selection analysis
+### Hyphy
+```bash
+hyphy FitMG94.bf --alignment gene_families_concat.fasta --tree phylogenetic_tree.nwk --lrt Yes --type local
+# gene_families_concat.fasta file is core gene alignments
+```
+
+
+
+
 
