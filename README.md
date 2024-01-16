@@ -29,7 +29,7 @@ The links below the sub-headings lead to the scripts needed for the correspondin
 - [Phytools](https://cran.r-project.org/web/packages/phytools/index.html)
 - [Seqkit](https://bioinf.shenwei.me/seqkit/)
 
->Take the KP16932 isolate as an example.
+>Take the A-baumannii-104 isolate as an example.
 
 ## 2. Dataset
 All assembled Illumina sequence data have been deposited in GenBank under the BioProject accession number [PRJNA778807](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA778807).
@@ -37,17 +37,17 @@ All assembled Illumina sequence data have been deposited in GenBank under the Bi
 ## 3. read trimming
 ### Trimmomatic
 ```bash
-java -jar trimmomatic-0.36.jar PE -threads 5 KP16932_raw_1.fq.gz KP16932_raw_2.fq.gz KP16932_clean_1.fq.gz KP16932__unpaired_1.fq.gz KP16932_clean_2.fq.gz KP16932__unpaired_2.fq.gz
+java -jar trimmomatic-0.36.jar PE -threads 5 A-baumannii-104_raw_1.fq.gz A-baumannii-104_raw_2.fq.gz A-baumannii-104_clean_1.fq.gz A-baumannii-104__unpaired_1.fq.gz A-baumannii-104_clean_2.fq.gz A-baumannii-104_unpaired_2.fq.gz
 ```
 
 ## 4. Assembly
 ### SPAdes
 ```bash
-spades.py -1 KP16932_clean_1.fq.gz -2 KP16932_clean_2.fq.gz --isolate --cov-cutoff auto -o KP16932.fasta
+spades.py -1 A-baumannii-104_clean_1.fq.gz -2 A-baumannii-104_clean_2.fq.gz --isolate --cov-cutoff auto -o A-baumannii-104.fasta
 ```
 ### Unicycle
 ```bash
-unicycler -1 KP16932_1.clean_1.fq.gz -2 KP16932_2.clean_1.fq.gz -l KP16932.nanopore.fq.gz -o KP16932.unicycle.fasta
+unicycler -1 A-baumannii-104_1.clean_1.fq.gz -2 A-baumannii-104_2.clean_1.fq.gz -l A-baumannii-104.nanopore.fq.gz -o A-baumannii-104.unicycle.fasta
 ```
 
 ## 5. Taxonomy assignment
@@ -66,7 +66,7 @@ fastANI --ql quer_genome.list --rl ref_genome.list -o FastANI.out -t 40
 ## 7. Genome annotation
 ### Prokka
 ```bash
-prokka KP16932.fasta --prefix KP16932 --outdir KP16932.prokka.out/KP16932 --compliant
+prokka A-baumannii-104.fasta --prefix A-baumannii-104 --outdir A-baumannii-104.prokka.out/KP16932 --compliant
 ```
 
 ## 8. ST assignment
