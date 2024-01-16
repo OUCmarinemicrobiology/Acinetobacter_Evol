@@ -171,11 +171,17 @@ plot(mtrees[[1]],cols,type="fan",fsize=0.8,ftype="off")
 
 ## 12. Selection analysis
 ### Hyphy
+#### Whole genome selection analysis
 ```bash
-hyphy FitMG94.bf --alignment gene_families_concat.fasta --tree phylogenetic_tree.nwk --lrt Yes --type local
-# gene_families_concat.fasta file is core gene alignments
+hyphy FitMG94.bf --alignment gene_families_alignment_concat.fasta --tree phylogenetic_tree.nwk --lrt Yes --type local
+# gene_families_alignment_concat.fasta file contain core gene sequence alignments
 ```
 
+#### KatG selection analysis
+```bash
+hyphy absrel --alignment katG_gene_alignment.fasta --tree phylogenetic_tree.nwk --output katG.hyphy-absrel.out > katG.hyphy-absrel.nohup.out
+#katG_gene_alignment.fasta file contain katG gene sequence aligemnts
+```
 
 
 
