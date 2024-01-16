@@ -169,7 +169,7 @@ cols <- as.matrix(cols)[,1]
 plot(mtrees[[1]],cols,type="fan",fsize=0.8,ftype="off")
 ```
 
-## 11. Selection analysis
+## 12. Selection analysis
 ### Hyphy
 ```bash
 hyphy FitMG94.bf --alignment gene_families_concat.fasta --tree phylogenetic_tree.nwk --lrt Yes --type local
