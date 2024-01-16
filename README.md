@@ -32,7 +32,7 @@ The links below the sub-headings lead to the scripts needed for the correspondin
 >Take the A-baumannii-104 isolate as an example.
 
 ## 2. Dataset
-All assembled Illumina sequence data have been deposited in GenBank under the BioProject accession number [PRJNA778807](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA778807).
+All assembled Illumina sequence data have been deposited in GenBank under the BioProject accession number [PRJNA663756](https://ncbi.nlm.nih.gov/bioproject/663756) and [PRJNA1063895](https://ncbi.nlm.nih.gov/bioproject/063895).
 
 ## 3. read trimming
 ### Trimmomatic
@@ -50,30 +50,32 @@ spades.py -1 A-baumannii-104_clean_1.fq.gz -2 A-baumannii-104_clean_2.fq.gz --is
 unicycler -1 A-baumannii-104_1.clean_1.fq.gz -2 A-baumannii-104_2.clean_1.fq.gz -l A-baumannii-104.nanopore.fq.gz -o A-baumannii-104.unicycle.fasta
 ```
 
-## 5. Taxonomy assignment
+## 5. Genome dereplication
+### dRep
+```bash
+nohup dRep dereplicate fasta_dir.dRep_comp_0.75_nc_30.out -sa 0.95 -nc 0.30 -p 24 -comp 70 -con 10 -g fasta_dir/*.fasta &
+# fasta_dir, the input directory containing a set of genomic assembly sequences.
+# fasta_dir.dRep_comp_0.75_nc_30.out, output directory.
+```
+
+## 6. Taxonomy assignment
 ### GTDB
 ```bash
 nohup gtdbtk classify_wf --genome_dir fasta_dir/ --out_dir fasta_dir.GTDB.out --extension fasta &
 # fasta_dir, the input directory containing a set of genomic assembly sequences.
 # fasta_dir.GTDB.out, output directory
 ```
-## 6. Amino acid identity (ANI) calculation
+
+## 7. Amino acid identity (ANI) calculation
 ### fastANI
 ```bash
 fastANI --ql quer_genome.list --rl ref_genome.list -o FastANI.out -t 40
 ```
 
-## 7. Genome annotation
+## 8. Genome annotation
 ### Prokka
 ```bash
 prokka A-baumannii-104.fasta --prefix A-baumannii-104 --outdir A-baumannii-104.prokka.out/KP16932 --compliant
-```
-
-## 8. ST assignment
-### Kleborate
-```bash
-kleborate --all -o kleborate.results.txt -a fasta_dir/*.fasta
-# fasta_dir, the input directory containing a set of genomic assembly sequences.
 ```
 
 ## 9. Identification of ARGs,
@@ -112,18 +114,17 @@ snp-sites -c gubbins.filtered_polymorphic_sites.fasta > clean.core.aln
 raxmlHPC -f a -x 12345 -p 12345 -# 100 -m GTRGAMMAX -s clean.core.aln -n tree
 ```
 
-## 11. Ancestral state reconstruction of mobile genetic element (MGE) number
+## 11. Ancestral state reconstruction of gene number
 ### Phytools, R
 ```R
-# core_SNP.tre and mge_count.csv can be found in `MGE_ancestral_state` dictionary,
-# selected replicon as example
+# phylogenetic_tre.nwk and gene_count.csv can be found in `Gene_ancestral_state` dictionary,
 setwd("path/work_dictionary")
 library(phytools)
 
-tree <- read.tree("core_SNP.tre")
+tree <- read.tree("hylogenetic_tre.nwk")
 #the phylogenetic tree built in 10 above.
 
-mge <- read.csv("mge_count.csv",row.names=1) # input MGE number of each isolates.
+mge <- read.csv("gene_count.csv",row.names=1) # input MGE number of each isolates.
 mge<-as.matrix(mge)[,1] # selected replicon as example
 
 # estimate ancestral states and compute variances & 95% confidence intervals for each node:
@@ -133,7 +134,7 @@ fit
 # projection of the reconstruction onto the edges of the tree
 obj<-contMap(tree,mge,plot=FALSE)
 plot(obj,legend=0.7*max(nodeHeights(tree)),
-     fsize=c(0.1,0.9), lwd=1, outline = F, leg.txt="Replicons",ftype="off")
+     fsize=c(0.1,0.9), lwd=1, outline = F, leg.txt="gene_count",ftype="off")
 # fsize, set font size
 # outline, logical value indicated whether or not to outline the plotted color bar with a 1 pt
 line.
@@ -143,80 +144,11 @@ line.
 # OR set colors manually
 obj<-setMap(obj,c("red", "#fffc00", "green", "purple", "blue", "#d7ff00", "black"))
 plot(obj,legend=0.7*max(nodeHeights(tree)),
-     fsize=c(0.1,0.9), lwd=1, outline = F, leg.txt="replicons",ftype="off")
+     fsize=c(0.1,0.9), lwd=1, outline = F, leg.txt="gene_count",ftype="off")
 ```
 
-## 12. Plasmid coverage across isolates
-### Blastn, Seqkit
-```bash
-# coverage_calculation.py can be found in `In-house_script` dictionary.
-# Blastn each genome to plasmid sequence
-makeblastdb -in plasmid.fasta -dbtype nucl -parse_seqids -out plasmid_db
-mkdir blastn_result
-for i in fasta_dir/*.fasta; do blastn -query $i -db plasmid_db -out blastn_result/${i##*/}.blastn.out -outfmt 6; done
 
-# calculate coverage
-seqkit fx2tab --length --name --header-line plasmid.fasta # calculate the length of plasmid
-cd blastn_result
-for i in *.out; do python coverage_calculation.py -i $i -l <plasmid length>; done > ../coverage_result.tab
-# -l, length of plasmid
-```
 
-## 13. Genotype
-### ComplexUpset
-```R
-# KL64_gene_matrix.tab can be found in `Genotype` dictionary.
-library(ggplot2)
-library(ComplexUpset)
-KL64 <- read.table("KL64_gene_matrix.tab",header=T, row.names=1)
-matrix <- colnames(KL64)[3:13]
-upset(KL64, matrix,min_size=0,base_annotations = list("intersection size" = intersection_size(counts = F,mapping = aes(fill=Year))))
-```
 
-## 14. Transmission analysis
-### regentrans
-```R
-# metadata.csv, clean.core.aln and clean.core.tree can be downloaded from `Transmission_analysis` dictionary.
-library(regentrans)
-library(ape)
-library(tidyverse)
-library(devtools)
-library(ggtree)
-library(pheatmap)
-library(phytools)
-library(gridExtra)
-library(cowplot)
-# set theme for plots 
-theme_set(theme_bw() + theme(strip.background = element_rect(fill="white",linetype='blank'), text=element_text(size=15)))
 
-# this is if your metadata is in a csv file
-metadata <- readr::read_csv("metadata.csv")
-# this is if your alignment is in a fasta file
-aln <- ape::read.dna("clean.core.aln", format = "fasta")
-# this is if the tree is in Newick format
-tr <- ape::read.tree("clean.core.tree")
 
-# Pairwise SNV distance matrix
-dists <- ape::dist.dna(x = aln, # DNAbin object as read in above
-                       as.matrix = TRUE, # return as matrix
-                       model = "N", # count pairwise distances
-                       pairwise.deletion = TRUE # delete sites with missing data in a pairwise way
-                       )
-                       
-# Extracting location and patients as a vectors
-# named vector of locations
-locs <- metadata%>%select(isolate_id, facility)%>%deframe()
-head(locs)
-# named vector of patients
-pt <- metadata%>%select(isolate_id, patient_id)%>%deframe()
-head(pt)
-
-# Visualizing intra-facility pair fraction distribution with help from get_frac_intra()
-# get pair types for pairwise SNV distances (intra vs. inter)
-pair_types <- get_pair_types(dists = dists, locs = locs, pt = pt)
-# get fraction of intra-facility pairs for each SNV distance
-frac_intra <- get_frac_intra(pair_types = pair_types)
-# write out the the fraction of intra-facility pairs for different SNV distances,
-#our results were produced from this table
-write.csv( frac_intra, file = "frac_intra.csv")
-```
