@@ -117,11 +117,11 @@ raxmlHPC -f a -x 12345 -p 12345 -# 100 -m GTRGAMMAX -s clean.core.aln -n tree
 ## 11. Ancestral state reconstruction of gene number
 ### Phytools, R
 ```R
-# phylogenetic_tre.nwk and gene_count.csv can be found in `Gene_ancestral_state` dictionary,
+# phylogenetic_tree.nwk and gene_count.csv can be found in `Gene_ancestral_state` dictionary,
 setwd("path/work_dictionary")
 library(phytools)
 
-tree <- read.tree("hylogenetic_tre.nwk")
+tree <- read.tree("phylogenetic_tree.nwk")
 #the phylogenetic tree built in 10 above.
 
 mge <- read.csv("gene_count.csv",row.names=1) # input MGE number of each isolates.
