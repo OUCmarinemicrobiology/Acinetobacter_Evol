@@ -149,7 +149,7 @@ plot(obj,legend=0.7*max(nodeHeights(tree)),
 ## 11. Habitat switch
 ### Phytools, R
 ```R
-# phylogenetic_tree.nwk and genome_habitat.csv can be found in `Habitat_ancestral_state` dictionary.
+# phylogenetic_tree.nwk and genome_habitat.csv can be found in `Habitat_switching` dictionary.
 setwd("path/work_dictionary")
 library(phytools)
 
@@ -163,7 +163,7 @@ par(mfrow=c(10,10))
 null<-sapply(mtrees,plot,colors=cols,lwd=1,ftype="off")
 pd<-summary(mtrees,plot=FALSE)
 pd
-cols <- read.csv("cols.CSV",row.names =1) #set color
+cols <- read.csv("cols.csv",row.names =1) #set color
 cols <- as.matrix(cols)[,1]
 plot(mtrees[[1]],cols,type="fan",fsize=0.8,ftype="off")
 ```
